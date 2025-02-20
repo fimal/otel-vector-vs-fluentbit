@@ -1,0 +1,101 @@
+sources:
+  vector_metrics:
+    type: "internal_metrics"
+    scrape_interval_secs: 10
+  license_metering:
+    type: "prometheus_scrape"
+    endpoints: [ "http://127.0.0.1:19010/stats/prometheus?filter=total_requests" ]
+    scrape_interval_secs: 60
+    scrape_timeout_secs: 5
+  access_logs:
+    type: "file"
+    include: [/logs/*access.log*]
+  security_logs:
+    type: "file"
+    include: [/logs/*security.log*]
+  request_data_logs:
+    type: "file"
+    include: [/logs/*request_data.log*]
+
+transforms:
+  access:
+    type: "remap"
+    inputs: [access_logs]
+    source: '.logtype = "Access"'
+  security:
+    type: "remap"
+    inputs: [security_logs]
+    source: '.logtype = "Forensics"'
+  request_data:
+    type: "remap"
+    inputs: [request_data_logs]
+    source: '.logtype = "RequestData"'
+
+sinks:
+  access_sink:
+    type: "http"
+    uri: http://waas-logstash.kwaf.svc:2020
+    encoding:
+      codec: "json"
+    batch:
+      # maximum size of a batch that is processed by a sink, default 1e+07 (bytes)
+      max_bytes: 100000000
+      timeout_secs: 1
+    buffer:
+      type: memory
+      max_events: 10000
+      when_full: block
+    inputs: [access]
+  security_sink:
+    type: "http"
+    uri: http://waas-logstash.kwaf.svc:2020
+    encoding:
+      codec: "json"
+    batch:
+      # maximum size of a batch that is processed by a sink, default 1e+07 (bytes)
+      max_bytes: 100000000
+      timeout_secs: 1
+    buffer:
+      type: memory
+      max_events: 10000
+      when_full: block
+    inputs: [security]
+  request_data_sink:
+    type: "http"
+    uri: http://waas-logstash.kwaf.svc:2020
+    encoding:
+      codec: "json"
+    batch:
+      # maximum size of a batch that is processed by a sink, default 1e+07 (bytes)
+      max_bytes: 100000000
+      timeout_secs: 1
+    buffer:
+      type: memory
+      max_events: 10000
+      when_full: block
+    inputs: [request_data]
+  license_metering_sink:
+    type: "http"
+    uri: http://waas-logstash.kwaf.svc:2020
+    encoding:
+      codec: "json"
+    batch:
+      # maximum size of a batch that is processed by a sink, default 1e+07 (bytes)
+      max_bytes: 100000000
+      timeout_secs: 1
+    buffer:
+      type: memory
+      max_events: 10000
+      when_full: block
+    inputs: [license_metering]
+  promethues_metrics:
+    type: "prometheus_exporter"
+    inputs: ["vector_metrics"]
+    address: "0.0.0.0:2025"
+    flush_period_secs: 60
+
+api:
+  enabled: true
+  address: "127.0.0.1:8686"
+  playground: true
+data_dir: "/logs/logagent"

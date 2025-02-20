@@ -1,0 +1,86 @@
+services:
+  envoy:
+    # image: envoyproxy/envoy:v1.32-latest
+    build:
+      context: envoy
+    container_name: envoy
+    depends_on:
+      fluentbit:
+        condition: service_started
+      app:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 200M
+    environment:
+      - DEBUG_LEVEL=info
+      - USE_STATSD=true
+      - SERVICE_NAME=app
+      - SERVICE_PORT=80
+      - LOG_PROCESSOR=fluentbit
+    networks:
+      - envoynet
+    # pid: "host"      
+    ports:
+      - "80:9000"
+      - "19000:19000"
+      - "19010:19010"
+    volumes:
+      - ./envoy/envoy.yaml:/config/envoy.yaml
+      - ./logs:/logs  
+  app:
+    container_name: app  
+    image: fimal/perf-nginx:latest
+    networks:
+      - envoynet
+    # pid: "host"      
+    ports:
+      - "9090:80"
+  fluentbit:
+    container_name: fluentbit  
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 200M    
+    image: fluent/fluent-bit:2.0.6
+    networks:
+      - envoynet
+    # pid: "host"         
+    ports:
+      - "2025:2025"
+    volumes:
+      - ./fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+      - ./logs:/logs
+  # logrotate:
+  #   container_name: logrotate  
+  #   image: altartifactory:8081/waas-snapshot-local-alt/waas-logrotate/dev:latest
+  #   environment:
+  #   #- ROTATE_PORT=19000
+  #   - PROCESS_TO_SIGNAL=envoy
+  #   - ROTATE_SIZE=10M
+  #   - ROTATE_NUM=3
+  #   - ROTATE_EVERY=60    
+  #   networks:
+  #     - envoynet
+  #   pid: "host"       
+  #   volumes:
+  #     - ./logs:/logs
+  k6:
+    container_name: k6
+    command: /tests/start_k6.sh
+    depends_on:
+      envoy:
+        condition: service_started     
+    entrypoint: /bin/sh    
+    image: grafana/k6
+    networks:
+      - envoynet 
+    volumes:
+      - ./k6:/tests
+networks:
+  envoynet:
+    driver: bridge
+    name: test

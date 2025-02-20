@@ -1,0 +1,33 @@
+                    accessLog:
+                      - name: envoy.access_loggers.http_grpc
+                        filter:
+                          metadataFilter:
+                            matchIfKeyNotFound: false
+                            matcher:
+                              filter: envoy.filters.http.ext_authz
+                              path:
+                                - key: x-enforcer-descriptors
+                              value:
+                                presentMatch: true
+                        typedConfig:
+                          "@type": type.googleapis.com/envoy.extensions.access_loggers.open_telemetry.v3.OpenTelemetryAccessLogConfig
+                          attributes:
+                            values:
+                              - key: descriptors
+                                value:
+                                  stringValue: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:x-enforcer-descriptors)%"
+                              - key: response_code ## Key should be an exact match to profile response tracking rule "field" ##
+                                value:
+                                  stringValue: "%RESPONSE_CODE%"
+                              - key: response_flags
+                                value:
+                                  stringValue: "%RESPONSE_FLAGS%"
+                              ## Additional Key:Value pairs may be added here ##
+                          commonConfig:
+                            grpcService:
+                              envoyGrpc:
+                                authority: rl_cluster
+                                clusterName: rl_cluster
+                              timeout: "5s"
+                            logName: response-tracking-update
+                            transportApiVersion: V3

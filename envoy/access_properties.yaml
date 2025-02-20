@@ -1,0 +1,143 @@
+---
+access_log:
+- name: envoy.access_loggers.http_grpc
+  typed_config:
+    "@type": type.googleapis.com/envoy.extensions.access_loggers.open_telemetry.v3.OpenTelemetryAccessLogConfig
+    common_config:
+      log_name: access-log
+      grpc_service:
+        envoy_grpc:
+          cluster_name: la_cluster
+        timeout: 5s
+      transport_api_version: V3
+    attributes:
+      values:
+      - key: ind
+        value:
+          string_value: enforcer_access
+      - key: start_time
+        value:
+          string_value: "%START_TIME%"
+      - key: bytes_recv
+        value:
+          string_value: "%BYTES_RECEIVED%"
+      - key: protocol
+        value:
+          string_value: "%PROTOCOL%"
+      - key: resp_code
+        value:
+          string_value: "%RESPONSE_CODE%"
+      - key: bytes_sent
+        value:
+          string_value: "%BYTES_SENT%"
+      - key: duration
+        value:
+          string_value: "%DURATION%"
+      - key: resp_duration
+        value:
+          string_value: "%RESPONSE_DURATION%"
+      - key: resp_tx_duration
+        value:
+          string_value: "%RESPONSE_TX_DURATION%"
+      - key: resp_flags
+        value:
+          string_value: "%RESPONSE_FLAGS%"
+      - key: upstream_host
+        value:
+          string_value: "%UPSTREAM_HOST%"
+      - key: upstream_cluster
+        value:
+          string_value: "%UPSTREAM_CLUSTER%"
+      - key: upstream_local_address
+        value:
+          string_value: "%UPSTREAM_LOCAL_ADDRESS%"
+      - key: downstream_remote_address
+        value:
+          string_value: "%DOWNSTREAM_REMOTE_ADDRESS%"
+      - key: downstream_local_address
+        value:
+          string_value: "%DOWNSTREAM_LOCAL_ADDRESS%"
+      - key: req_method
+        value:
+          string_value: "%REQ(:METHOD)%"
+      - key: req_server_name
+        value:
+          string_value: "%REQUESTED_SERVER_NAME%"
+      - key: resp_time
+        value:
+          string_value: "%RESP(X-ENVOY-UPSTREAM-SERVICE-TIME)%"
+      - key: req_x_forward
+        value:
+          string_value: "%REQ(X-FORWARDED-FOR)%"
+      - key: req_xid
+        value:
+          string_value: "%REQ(X-REQUEST-ID)%"
+      - key: auth
+        value:
+          string_value: "%REQ(:AUTHORITY)%"
+      - key: user_ip_header
+        value:
+          string_value: "%DYNAMIC_METADATA(waas.cdn.headers:user_ip_header_name)%"
+      - key: user_ip_value
+        value:
+          string_value: "%DYNAMIC_METADATA(waas.cdn.headers:user_ip_header_value)%"
+      - key: host_name
+        value:
+          string_value: "%DYNAMIC_METADATA(envoy.http_connection_manager.access_log:host_name)%"
+      - key: classifier_name
+        value:
+          string_value: "%DYNAMIC_METADATA(envoy.http_connection_manager.access_log:classifier_name)%"
+      - key: policy_name
+        value:
+          string_value: "%DYNAMIC_METADATA(envoy.http_connection_manager.access_log:policy_name)%"
+      - key: policy_hash
+        value:
+          string_value: "%DYNAMIC_METADATA(envoy.http_connection_manager.access_log:policy_hash)%"
+      - key: req_path
+        value:
+          string_value: "%DYNAMIC_METADATA(envoy.http_connection_manager.access_log:request_path)%"
+      - key: agent
+        value:
+          string_value: "%DYNAMIC_METADATA(envoy.http_connection_manager.access_log:user_agent)%"
+      - key: content_length
+        value:
+          string_value: "%REQ(CONTENT-LENGTH)%"
+      - key: content_type
+        value:
+          string_value: "%REQ(CONTENT-TYPE)%"
+      - key: incomplete_protections
+        value:
+          string_value: "%DYNAMIC_METADATA(envoy.http_connection_manager.access_log:incomplete_protections)%"
+      - key: termiation_location
+        value:
+          string_value: "%DYNAMIC_METADATA(envoy.http_connection_manager.access_log:termiation_location)%"
+      - key: enforcer_termiation_time
+        value:
+          string_value: "%DYNAMIC_METADATA(envoy.http_connection_manager.access_log:termiation_time)%"
+      - key: inspection
+        value:
+          string_value: "%DYNAMIC_METADATA(envoy.http_connection_manager.access_log:inspection)%"
+      - key: headers_count
+        value:
+          string_value: "%DYNAMIC_METADATA(envoy.http_connection_manager.access_log:headers_count)%"
+      - key: uri_params_count
+        value:
+          string_value: "%DYNAMIC_METADATA(envoy.http_connection_manager.access_log:uri_params_count)%"
+      - key: body_params_count
+        value:
+          string_value: "%DYNAMIC_METADATA(envoy.http_connection_manager.access_log:body_params_count)%"
+      - key: cookie_params_count
+        value:
+          string_value: "%DYNAMIC_METADATA(envoy.http_connection_manager.access_log:cookie_params_count)%"
+      - key: event_type
+        value:
+          string_value: access
+      - key: user_geo
+        value:
+          string_value: "%DYNAMIC_METADATA(envoy.http_connection_manager.access_log:user_geo)%"
+      - key: waas_profile
+        value:
+          string_value: ''
+      - key: waas_tag
+        value:
+          string_value: enforcer

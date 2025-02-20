@@ -1,0 +1,293 @@
+admin:
+  access_log_path: "/dev/null"
+  address:
+    socket_address:
+      address: 0.0.0.0
+      port_value: 19000
+# stats_sinks:
+# - name: envoy.statsd
+#   typed_config:
+#     "@type": type.googleapis.com/envoy.config.metrics.v3.StatsdSink
+#     address:
+#       socket_address:
+#         address: ${LOG_PROCESSOR_IP}
+#         port_value: 8125
+#     prefix: envoy.statsd.metrics
+stats_flush_interval: 3s
+static_resources:
+  listeners:
+    - name: listener_0
+      address:
+        socket_address:
+          address: 0.0.0.0
+          port_value: 9000
+      filter_chains:
+      - filters:
+        - name: envoy.filters.network.http_connection_manager
+          typed_config:
+            "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+            stat_prefix: access_log
+            access_log:
+            - name: envoy.access_loggers.open_telemetry
+              typed_config:
+                "@type": type.googleapis.com/envoy.extensions.access_loggers.open_telemetry.v3.OpenTelemetryAccessLogConfig
+                attributes:
+                  values:
+                    - key: ind
+                      value:
+                        string_value: enforcer_access
+                    - key: start_time
+                      value:
+                        string_value: "%START_TIME%"
+                    - key: bytes_recv
+                      value:
+                        string_value: "%BYTES_RECEIVED%"
+                    - key: protocol
+                      value:
+                        string_value: "%PROTOCOL%"
+                    - key: resp_code
+                      value:
+                        string_value: "%RESPONSE_CODE%"
+                    - key: bytes_sent
+                      value:
+                        string_value: "%BYTES_SENT%"
+                    - key: duration
+                      value:
+                        string_value: "%DURATION%"
+                    - key: resp_duration
+                      value:
+                        string_value: "%RESPONSE_DURATION%"
+                    - key: resp_tx_duration
+                      value:
+                        string_value: "%RESPONSE_TX_DURATION%"
+                    - key: resp_flags
+                      value:
+                        string_value: "%RESPONSE_FLAGS%"
+                    - key: upstream_host
+                      value:
+                        string_value: "%UPSTREAM_HOST%"
+                    - key: upstream_cluster
+                      value:
+                        string_value: "%UPSTREAM_CLUSTER%"
+                    - key: upstream_local_address
+                      value:
+                        string_value: "%UPSTREAM_LOCAL_ADDRESS%"
+                    - key: downstream_remote_address
+                      value:
+                        string_value: "%DOWNSTREAM_REMOTE_ADDRESS%"
+                    - key: downstream_local_address
+                      value:
+                        string_value: "%DOWNSTREAM_LOCAL_ADDRESS%"
+                    - key: req_method
+                      value:
+                        string_value: "%REQ(:METHOD)%"
+                    - key: req_server_name
+                      value:
+                        string_value: "%REQUESTED_SERVER_NAME%"
+                    - key: resp_time
+                      value:
+                        string_value: "%RESP(X-ENVOY-UPSTREAM-SERVICE-TIME)%"
+                    - key: req_x_forward
+                      value:
+                        string_value: "%REQ(X-FORWARDED-FOR)%"
+                    - key: req_xid
+                      value:
+                        string_value: "%REQ(X-REQUEST-ID)%"
+                    - key: auth
+                      value:
+                        string_value: "%REQ(:AUTHORITY)%"
+                    - key: user_ip_header
+                      value:
+                        string_value: "%DYNAMIC_METADATA(waas.cdn.headers:user_ip_header_name)%"
+                    - key: user_ip_value
+                      value:
+                        string_value: "%DYNAMIC_METADATA(waas.cdn.headers:user_ip_header_value)%"
+                    - key: host_name
+                      value:
+                        string_value: "%DYNAMIC_METADATA(envoy.http_connection_manager.access_log:host_name)%"
+                    - key: classifier_name
+                      value:
+                        string_value: "%DYNAMIC_METADATA(envoy.http_connection_manager.access_log:classifier_name)%"
+                    - key: policy_name
+                      value:
+                        string_value: "%DYNAMIC_METADATA(envoy.http_connection_manager.access_log:policy_name)%"
+                    - key: policy_hash
+                      value:
+                        string_value: "%DYNAMIC_METADATA(envoy.http_connection_manager.access_log:policy_hash)%"
+                    - key: req_path
+                      value:
+                        string_value: "%DYNAMIC_METADATA(envoy.http_connection_manager.access_log:request_path)%"
+                    - key: agent
+                      value:
+                        string_value: "%DYNAMIC_METADATA(envoy.http_connection_manager.access_log:user_agent)%"
+                    - key: content_length
+                      value:
+                        string_value: "%REQ(CONTENT-LENGTH)%"
+                    - key: content_type
+                      value:
+                        string_value: "%REQ(CONTENT-TYPE)%"
+                    - key: incomplete_protections
+                      value:
+                        string_value: "%DYNAMIC_METADATA(envoy.http_connection_manager.access_log:incomplete_protections)%"
+                    - key: termiation_location
+                      value:
+                        string_value: "%DYNAMIC_METADATA(envoy.http_connection_manager.access_log:termiation_location)%"
+                    - key: enforcer_termiation_time
+                      value:
+                        string_value: "%DYNAMIC_METADATA(envoy.http_connection_manager.access_log:termiation_time)%"
+                    - key: inspection
+                      value:
+                        string_value: "%DYNAMIC_METADATA(envoy.http_connection_manager.access_log:inspection)%"
+                    - key: headers_count
+                      value:
+                        string_value: "%DYNAMIC_METADATA(envoy.http_connection_manager.access_log:headers_count)%"
+                    - key: uri_params_count
+                      value:
+                        string_value: "%DYNAMIC_METADATA(envoy.http_connection_manager.access_log:uri_params_count)%"
+                    - key: body_params_count
+                      value:
+                        string_value: "%DYNAMIC_METADATA(envoy.http_connection_manager.access_log:body_params_count)%"
+                    - key: cookie_params_count
+                      value:
+                        string_value: "%DYNAMIC_METADATA(envoy.http_connection_manager.access_log:cookie_params_count)%"
+                    - key: event_type
+                      value:
+                        string_value: access
+                    - key: user_geo
+                      value:
+                        string_value: "%DYNAMIC_METADATA(envoy.http_connection_manager.access_log:user_geo)%"
+                    - key: waas_profile
+                      value:
+                        string_value: ''
+                    - key: waas_tag
+                      value:
+                        string_value: enforcer                                      
+                    ## Additional Key:Value pairs may be added here ##
+                common_config:
+                  log_name: access_log
+                  transport_api_version: V3
+                  grpc_service:
+                        envoy_grpc:
+                            authority: vector
+                            cluster_name: vector
+                        timeout: "5s"
+                  # config:
+                  #   json_format:
+                  #     auth: "%REQ(:AUTHORITY)%"
+                  #     bytes_sent: "%BYTES_SENT%"
+                  #     bytes_recv: "%BYTES_RECEIVED%"            
+                  #     content_type: "%REQ(CONTENT-TYPE)%"
+                  #     content_length: "%REQ(CONTENT-LENGTH)%"
+                  #     downstream_remote_address: "%DOWNSTREAM_REMOTE_ADDRESS%"
+                  #     downstream_local_address: "%DOWNSTREAM_LOCAL_ADDRESS%"
+                  #     duration: "%DURATION%"
+                  #     event_type: "access"
+                  #     ind: "enforcer access"
+                  #     protocol: "%PROTOCOL%"
+                  #     req_method: "%REQ(:METHOD)%"
+                  #     req_path: "%REQ(X-ENVOY-ORIGINAL-PATH?:PATH)%"
+                  #     req_server_name: "%REQUESTED_SERVER_NAME%"
+                  #     req_x_forward: "%REQ(X-FORWARDED-FOR)%"
+                  #     req_xid: "%REQ(X-REQUEST-ID)%"                    
+                  #     resp_code: "%RESPONSE_CODE%"
+                  #     resp_duration: "%RESPONSE_DURATION%"
+                  #     resp_flags: "%RESPONSE_FLAGS%"                                      
+                  #     resp_time: "%RESP(X-ENVOY-UPSTREAM-SERVICE-TIME)%"
+                  #     #resp_tx_duration: "%RESPONSE_TX_DURATION"                                     
+                  #     start_time: "%START_TIME%"                    
+                  #     upstream_cluster: "%UPSTREAM_CLUSTER%"                    
+                  #     upstream_host: "%UPSTREAM_HOST%"
+                  #     upstream_local_address: "%UPSTREAM_LOCAL_ADDRESS%"
+                  #     waas_tag: "enforcer"
+            http_filters:
+            - name: envoy.filters.http.router
+              typed_config:
+                "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+            route_config:
+              name: local_route
+              virtual_hosts:
+              - name: local_service
+                domains: ["*"]
+                routes:
+                - match:
+                    prefix: "/"
+                  route:
+                    cluster: app_cluster
+    - name: lst-metrics
+      address:
+        socket_address:
+          address: 0.0.0.0
+          port_value: 19010
+      filter_chains:
+      - filters:
+        - name: envoy.http_connection_manager
+          typed_config:
+            "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+            stat_prefix: envoy_metrics
+            route_config:
+              name: local_route
+              virtual_hosts:
+              - name: backend
+                domains:
+                - "*"
+                routes:
+                - match:
+                    prefix: "/stats/prometheus"
+                  route:
+                    cluster: envoy_metrics
+                - match:
+                    prefix: "/metrics"
+                  route:
+                    cluster: envoy_metrics
+                    regex_rewrite:
+                      pattern:
+                        regex: metrics
+                      substitution: stats/prometheus?text_readouts
+                response_headers_to_remove:
+                - Server
+            http_filters:
+            - name: envoy.filters.http.router
+              typed_config:
+                "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+            server_header_transformation: PASS_THROUGH
+  clusters:
+    - name: envoy_metrics
+      type: STATIC
+      connect_timeout: 1s
+      load_assignment:
+        cluster_name: envoy_metrics
+        endpoints:
+        - lb_endpoints:
+          - endpoint:
+              address:
+                socket_address:
+                  address: 127.0.0.1
+                  port_value: 19000
+    ### Vector cluster to send access logs
+    - name: vector
+      type: STRICT_DNS
+      connect_timeout: 1s
+      http2_protocol_options: {}  # Enables HTTP/2
+      load_assignment:
+        cluster_name: vector
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: vector
+                      port_value: 50051
+    ### Application Cluster
+    - name: app_cluster
+      connect_timeout: 1s
+      type: STRICT_DNS
+      lb_policy: ROUND_ROBIN
+      load_assignment:
+        cluster_name: app_cluster
+        endpoints:
+        - lb_endpoints:
+          - endpoint:
+              address:
+                socket_address:
+                  address: ${SERVICE_NAME}
+                  port_value: ${SERVICE_PORT}

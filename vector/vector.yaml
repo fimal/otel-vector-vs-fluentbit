@@ -1,0 +1,38 @@
+sources:
+  access-log-otel:
+    type: opentelemetry
+    grpc:
+      address: 0.0.0.0:50051
+    http:
+      address: 0.0.0.0:50052
+      headers: ["*"]
+      keepalive:
+        max_connection_age_jitter_factor: 0.1
+        max_connection_age_secs: 300         
+sinks:
+  console:
+    type: console
+    inputs: ["access-log-otel.logs"]
+    encoding:
+      codec: "json"
+      # json:
+      #   pretty: true
+  # out:
+  #   type: "blackhole"
+  #   inputs: ["*"]
+  # console:
+  #   type: "console"
+  #   inputs: ["access.*"]
+  #   target: stdout
+  #   encoding:
+  #     codec: raw_message    
+    # encoding:
+    #   codec: "json"
+      # json:
+      #   pretty: true
+api:
+  enabled: true
+  address: "127.0.0.1:8686"
+  playground: true
+# Set global options
+data_dir: "/var/lib/vector"
